@@ -275,6 +275,7 @@
 				max-width: var(--canvas-mobile-width);
 				margin: 10px auto 0;
 			}
+			.mobile-controls #mobileRestart { display: none; }
             
             .controls {
                 display: none !important;
@@ -421,6 +422,17 @@
 				color: #fff;
 			}
 			#nextSide { width: 44px; height: 44px; }
+			.mini-restart {
+				width: 36px;
+				height: 28px;
+				background: rgba(255, 255, 255, 0.12);
+				border: 1px solid rgba(255, 255, 255, 0.25);
+				border-radius: 6px;
+				color: #fff;
+				font-size: 14px;
+				font-weight: 700;
+				cursor: pointer;
+			}
 		}
 
 		@media (max-width: 360px) {
@@ -503,6 +515,9 @@
 				<div class="hud-block">
 					<div class="hud-label">Next</div>
 					<canvas id="nextSide" width="44" height="44" class="next-piece"></canvas>
+				</div>
+				<div class="hud-block">
+					<button id="mobileRestartTop" class="mini-restart" title="Restart">↻</button>
 				</div>
 			</div>
 		</div>
@@ -833,7 +848,9 @@
         
         document.getElementById('restart').addEventListener('click', resetGame);
         document.getElementById('restartFromOver').addEventListener('click', resetGame);
-        document.getElementById('mobileRestart').addEventListener('click', resetGame);
+		document.getElementById('mobileRestart').addEventListener('click', resetGame);
+		const mobileRestartTop = document.getElementById('mobileRestartTop');
+		if (mobileRestartTop) mobileRestartTop.addEventListener('click', resetGame);
         
         // Mobile touch controls
         document.getElementById('leftBtn').addEventListener('click', () => {
