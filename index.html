@@ -26,6 +26,16 @@
             gap: 40px;
             align-items: flex-start;
             padding: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                gap: 20px;
+                padding: 10px;
+            }
         }
 
         .game-area {
@@ -35,18 +45,50 @@
             padding: 30px;
             backdrop-filter: blur(10px);
         }
+        
+        @media (max-width: 768px) {
+            .game-area {
+                padding: 15px;
+            }
+        }
 
         canvas {
             display: block;
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            height: auto;
+        }
+        
+        @media (max-width: 768px) {
+            #tetris {
+                width: 250px !important;
+                height: 500px !important;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            #tetris {
+                width: 200px !important;
+                height: 400px !important;
+            }
         }
 
         .sidebar {
             display: flex;
             flex-direction: column;
             gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+                gap: 15px;
+            }
         }
 
         .info-panel {
@@ -56,6 +98,21 @@
             padding: 25px;
             backdrop-filter: blur(10px);
             min-width: 200px;
+        }
+        
+        @media (max-width: 768px) {
+            .info-panel {
+                padding: 15px;
+                min-width: 150px;
+                flex: 1;
+                min-width: calc(50% - 10px);
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .info-panel {
+                min-width: 100%;
+            }
         }
 
         h2 {
@@ -73,6 +130,12 @@
             letter-spacing: -1px;
             color: #fff;
             margin-bottom: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .score-value {
+                font-size: 32px;
+            }
         }
 
         .level-value {
