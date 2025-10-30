@@ -33,8 +33,10 @@
         
         @media (max-width: 768px) {
             .container {
-                gap: 20px;
+                gap: 15px;
                 padding: 10px;
+                flex-direction: column;
+                align-items: center;
             }
         }
 
@@ -87,7 +89,8 @@
                 flex-wrap: wrap;
                 justify-content: center;
                 width: 100%;
-                gap: 15px;
+                gap: 10px;
+                order: -1;
             }
         }
 
@@ -102,16 +105,19 @@
         
         @media (max-width: 768px) {
             .info-panel {
-                padding: 15px;
-                min-width: 150px;
-                flex: 1;
-                min-width: calc(50% - 10px);
+                padding: 10px 15px;
+                min-width: auto;
+                flex: 0 1 auto;
+            }
+            
+            .info-panel:last-child {
+                display: none;
             }
         }
         
         @media (max-width: 400px) {
             .info-panel {
-                min-width: 100%;
+                min-width: auto;
             }
         }
 
@@ -122,6 +128,14 @@
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.6);
             margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 9px;
+                margin-bottom: 5px;
+                letter-spacing: 1px;
+            }
         }
 
         .score-value {
@@ -134,7 +148,8 @@
         
         @media (max-width: 768px) {
             .score-value {
-                font-size: 32px;
+                font-size: 20px;
+                margin-bottom: 0;
             }
         }
 
@@ -142,6 +157,12 @@
             font-size: 24px;
             font-weight: 600;
             color: #fff;
+        }
+        
+        @media (max-width: 768px) {
+            .level-value {
+                font-size: 16px;
+            }
         }
 
         .next-piece {
@@ -153,6 +174,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        @media (max-width: 768px) {
+            .next-piece {
+                width: 60px;
+                height: 60px;
+            }
         }
 
         .controls {
@@ -218,14 +246,75 @@
             margin-bottom: 30px;
             color: rgba(255, 255, 255, 0.7);
         }
+
+        .mobile-controls {
+            display: none;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: block;
+                padding: 15px;
+            }
+            
+            .controls {
+                display: none !important;
+            }
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .control-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        .control-btn.wide {
+            grid-column: span 3;
+        }
+
+        .control-btn.rotate-btn {
+            grid-column: 2;
+        }
+
+        .control-btn.empty {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="game-area">
-            <canvas id="tetris" width="300" height="600"></canvas>
-        </div>
-        
         <div class="sidebar">
             <div class="info-panel">
                 <h2>Score</h2>
@@ -253,6 +342,27 @@
                 </div>
                 <button id="restart" style="width: 100%; margin-top: 20px;">Restart</button>
             </div>
+        </div>
+        
+        
+        
+        <div class="game-area">
+            <canvas id="tetris" width="300" height="600"></canvas>
+        </div>
+
+        <div class="mobile-controls">
+            <div class="controls-grid">
+                <div class="control-btn empty"></div>
+                <div class="control-btn rotate-btn" id="rotateBtn">↻</div>
+                <div class="control-btn empty"></div>
+                
+                <div class="control-btn" id="leftBtn">←</div>
+                <div class="control-btn" id="downBtn">↓</div>
+                <div class="control-btn" id="rightBtn">→</div>
+                
+                <div class="control-btn wide" id="dropBtn">DROP</div>
+            </div>
+            <button id="mobileRestart" style="width: 100%; margin-top: 15px;">Restart</button>
         </div>
     </div>
 
@@ -398,17 +508,23 @@
         }
         
         function drawNext() {
+            const canvasSize = window.innerWidth <= 768 ? 60 : 120;
+            const blockSize = window.innerWidth <= 768 ? 10 : 20;
+            
+            nextCanvas.width = canvasSize;
+            nextCanvas.height = canvasSize;
+            
             nextCtx.fillStyle = '#0a0a0a';
             nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
             
             if (nextPiece) {
-                const offsetX = (120 - nextPiece.shape[0].length * 20) / 2;
-                const offsetY = (120 - nextPiece.shape.length * 20) / 2;
+                const offsetX = (canvasSize - nextPiece.shape[0].length * blockSize) / 2;
+                const offsetY = (canvasSize - nextPiece.shape.length * blockSize) / 2;
                 
                 for (let row = 0; row < nextPiece.shape.length; row++) {
                     for (let col = 0; col < nextPiece.shape[row].length; col++) {
                         if (nextPiece.shape[row][col]) {
-                            drawBlock(nextCtx, col + offsetX / 20, row + offsetY / 20, 20);
+                            drawBlock(nextCtx, col + offsetX / blockSize, row + offsetY / blockSize, blockSize);
                         }
                     }
                 }
@@ -546,6 +662,44 @@
         
         document.getElementById('restart').addEventListener('click', resetGame);
         document.getElementById('restartFromOver').addEventListener('click', resetGame);
+        document.getElementById('mobileRestart').addEventListener('click', resetGame);
+        
+        // Mobile touch controls
+        document.getElementById('leftBtn').addEventListener('click', () => {
+            if (gameRunning && !paused && currentPiece) {
+                currentPiece.move(-1, 0);
+                drawBoard();
+            }
+        });
+        
+        document.getElementById('rightBtn').addEventListener('click', () => {
+            if (gameRunning && !paused && currentPiece) {
+                currentPiece.move(1, 0);
+                drawBoard();
+            }
+        });
+        
+        document.getElementById('downBtn').addEventListener('click', () => {
+            if (gameRunning && !paused && currentPiece) {
+                currentPiece.move(0, 1);
+                drawBoard();
+            }
+        });
+        
+        document.getElementById('rotateBtn').addEventListener('click', () => {
+            if (gameRunning && !paused && currentPiece) {
+                currentPiece.rotate();
+                drawBoard();
+            }
+        });
+        
+        document.getElementById('dropBtn').addEventListener('click', () => {
+            if (gameRunning && !paused && currentPiece) {
+                currentPiece.hardDrop();
+                mergePiece();
+                drawBoard();
+            }
+        });
         
         resetGame();
         gameLoop();
