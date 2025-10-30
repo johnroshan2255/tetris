@@ -50,7 +50,8 @@
         
         @media (max-width: 768px) {
             .game-area {
-                padding: 15px;
+				padding: 15px;
+				order: 0;
             }
         }
 
@@ -84,13 +85,13 @@
         }
         
         @media (max-width: 768px) {
-            .sidebar {
+			.sidebar {
                 flex-direction: row;
                 flex-wrap: wrap;
                 justify-content: center;
                 width: 100%;
                 gap: 10px;
-                order: -1;
+				order: 1;
             }
         }
 
@@ -262,6 +263,7 @@
             .mobile-controls {
                 display: block;
                 padding: 15px;
+				order: 2;
             }
             
             .controls {
