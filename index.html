@@ -70,17 +70,18 @@
         }
         
 		@media (max-width: 768px) {
+			:root { --canvas-mobile-width: calc(min(92vw, 340px) - 96px); }
 			#tetris {
-				/* subtract side HUD width (2 * 44px + gaps) */
-				width: calc(min(92vw, 340px) - 96px) !important;
-				height: calc(calc(min(92vw, 340px) - 96px) * 2) !important;
+				width: var(--canvas-mobile-width) !important;
+				height: calc(var(--canvas-mobile-width) * 2) !important;
 			}
 		}
         
 		@media (max-width: 400px) {
+			:root { --canvas-mobile-width: calc(min(94vw, 300px) - 96px); }
 			#tetris {
-				width: calc(min(94vw, 300px) - 96px) !important;
-				height: calc(calc(min(94vw, 300px) - 96px) * 2) !important;
+				width: var(--canvas-mobile-width) !important;
+				height: calc(var(--canvas-mobile-width) * 2) !important;
 			}
 		}
 
@@ -260,31 +261,33 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 20px;
+			padding: 20px;
             backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 350px;
+			width: 100%;
+			max-width: 350px;
         }
 
-        @media (max-width: 768px) {
-            .mobile-controls {
-                display: block;
-                padding: 15px;
+		@media (max-width: 768px) {
+			.mobile-controls {
+				display: block;
+				padding: 12px;
 				order: 2;
-            }
+				max-width: var(--canvas-mobile-width);
+				margin: 10px auto 0;
+			}
             
             .controls {
                 display: none !important;
             }
         }
 
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 300px;
-            margin: 0 auto;
-        }
+			.controls-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 8px;
+				max-width: 100%;
+				margin: 0 auto;
+			}
 
         .control-btn {
             background: rgba(255, 255, 255, 0.1);
@@ -370,14 +373,14 @@
 			}
 
 			.control-btn {
-				padding: 14px;
-				font-size: 18px;
+				padding: 10px;
+				font-size: 14px;
 				border-radius: 10px;
 			}
 
 			.control-btn.wide {
-				padding: 12px;
-				font-size: 16px;
+				padding: 10px;
+				font-size: 13px;
 			}
 
 			button {
