@@ -40,7 +40,7 @@
             }
         }
 
-        .game-area {
+		.game-area {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
@@ -49,12 +49,16 @@
 			position: relative;
         }
         
-        @media (max-width: 768px) {
-            .game-area {
-				padding: 15px;
+		@media (max-width: 768px) {
+			.game-area {
+				padding: 12px;
 				order: 0;
-            }
-        }
+				display: flex;
+				align-items: flex-start;
+				justify-content: center;
+				gap: 8px;
+			}
+		}
 
         canvas {
             display: block;
@@ -67,15 +71,16 @@
         
 		@media (max-width: 768px) {
 			#tetris {
-				width: min(92vw, 340px) !important;
-				height: calc(min(92vw, 340px) * 2) !important;
+				/* subtract side HUD width (2 * 44px + gaps) */
+				width: calc(min(92vw, 340px) - 96px) !important;
+				height: calc(calc(min(92vw, 340px) - 96px) * 2) !important;
 			}
 		}
         
 		@media (max-width: 400px) {
 			#tetris {
-				width: min(94vw, 300px) !important;
-				height: calc(min(94vw, 300px) * 2) !important;
+				width: calc(min(94vw, 300px) - 96px) !important;
+				height: calc(calc(min(94vw, 300px) - 96px) * 2) !important;
 			}
 		}
 
@@ -381,40 +386,38 @@
 			}
 		}
 
-		/* HUD overlay shown on mobile within game area */
-		.hud {
-			position: absolute;
-			top: 8px;
-			left: 8px;
-			right: 8px;
-			display: none;
-		}
-
-		.hud-row {
-			display: flex;
-			gap: 8px;
-			align-items: center;
-		}
-
-		.hud-block {
-			background: rgba(0, 0, 0, 0.4);
-			border: 1px solid rgba(255, 255, 255, 0.15);
-			border-radius: 8px;
-			padding: 6px 8px;
-			display: flex;
-			flex-direction: column;
-			gap: 2px;
-		}
-
-		.hud-block span {
-			font-size: 9px;
-			letter-spacing: 1px;
-			text-transform: uppercase;
-			color: rgba(255, 255, 255, 0.6);
-		}
-
+		/* Side HUD (mobile) */
+		.hud-col { display: none; }
 		@media (max-width: 768px) {
-			.hud { display: block; }
+			.hud-col {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				width: 44px;
+				min-width: 44px;
+			}
+			.hud-block {
+				background: rgba(0, 0, 0, 0.35);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 8px;
+				padding: 4px;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				align-items: center;
+			}
+			.hud-label {
+				font-size: 8px;
+				letter-spacing: 0.5px;
+				text-transform: uppercase;
+				color: rgba(255, 255, 255, 0.6);
+			}
+			.hud-value {
+				font-size: 12px;
+				font-weight: 700;
+				color: #fff;
+			}
+			#nextSide { width: 44px; height: 44px; }
 		}
 
 		@media (max-width: 360px) {
@@ -481,25 +484,25 @@
         
         
         
-        <div class="game-area">
-			<canvas id="tetris" width="300" height="600"></canvas>
-			<div class="hud">
-				<div class="hud-row">
-					<div class="hud-block">
-						<span>Score</span>
-						<div class="score-value" id="scoreMobile">0</div>
-					</div>
-					<div class="hud-block">
-						<span>Level</span>
-						<div class="level-value" id="levelMobile">1</div>
-					</div>
-					<div class="hud-block">
-						<span>Next</span>
-						<canvas id="nextMobile" width="60" height="60" class="next-piece"></canvas>
-					</div>
+		<div class="game-area">
+			<div class="hud-col">
+				<div class="hud-block">
+					<div class="hud-label">Score</div>
+					<div class="hud-value" id="scoreSide">0</div>
+				</div>
+				<div class="hud-block">
+					<div class="hud-label">Level</div>
+					<div class="hud-value" id="levelSide">1</div>
 				</div>
 			</div>
-        </div>
+			<canvas id="tetris" width="300" height="600"></canvas>
+			<div class="hud-col">
+				<div class="hud-block">
+					<div class="hud-label">Next</div>
+					<canvas id="nextSide" width="44" height="44" class="next-piece"></canvas>
+				</div>
+			</div>
+		</div>
 
         <div class="mobile-controls">
             <div class="controls-grid">
@@ -660,14 +663,14 @@
         
 		function drawNext() {
 			const isMobile = window.innerWidth <= 768;
-			const canvasSize = isMobile ? 60 : 120;
-			const blockSize = isMobile ? 10 : 20;
+			const canvasSize = isMobile ? 44 : 120;
+			const blockSize = isMobile ? 8 : 20;
 
 			const targets = [{ c: nextCanvas, ctx: nextCtx }];
-			const mobileCanvas = document.getElementById('nextMobile');
-			if (mobileCanvas) {
-				const mCtx = mobileCanvas.getContext('2d');
-				targets.push({ c: mobileCanvas, ctx: mCtx });
+			const sideCanvas = document.getElementById('nextSide');
+			if (sideCanvas) {
+				const sCtx = sideCanvas.getContext('2d');
+				targets.push({ c: sideCanvas, ctx: sCtx });
 			}
 
 			for (const t of targets) {
@@ -742,10 +745,10 @@
 		function updateUI() {
 			document.getElementById('score').textContent = score;
 			document.getElementById('level').textContent = level;
-			const sM = document.getElementById('scoreMobile');
-			const lM = document.getElementById('levelMobile');
-			if (sM) sM.textContent = score;
-			if (lM) lM.textContent = level;
+			const sSide = document.getElementById('scoreSide');
+			const lSide = document.getElementById('levelSide');
+			if (sSide) sSide.textContent = score;
+			if (lSide) lSide.textContent = level;
 		}
         
         function gameOver() {
